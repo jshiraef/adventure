@@ -1,5 +1,8 @@
 package computc;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -18,9 +21,9 @@ public class Hero extends Entity
 		
 		this.image = new Image("res/hero.png");
 		
-		moveSpeed = 0.015f;
+		moveSpeed = 0.012f;
 		maxSpeed = .2f;
-		stopSpeed = 0.001f;
+		stopSpeed = 0.01f;
 		health = 5;
 	}
 	
@@ -30,14 +33,18 @@ public class Hero extends Entity
 		checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 		
+		if (blinkTimer > 0)
+			blinkTimer --;
+		
+		if(blinkTimer == 0)
+			blinking = false;
 	}
 	
 	public void render(Graphics graphics, Camera camera)
 	{
 		if(blinking) 
 		{
-			long elapsed = (System.nanoTime() - blinkTimer) / 1000000;
-			if(elapsed / 100 % 2 == 0) 
+			if(blinkTimer % 4 == 0) 
 			{
 				return;
 			}
@@ -59,7 +66,7 @@ public class Hero extends Entity
 			dead = true;
 		
 		blinking = true;
-		blinkTimer = (int) System.nanoTime();
+		blinkTimer = 2000;
 	}
 	
 	private void getNextPosition(Input input, int delta) 
@@ -136,7 +143,6 @@ public class Hero extends Entity
 					dx = 0;
 				}
 			}
-			
 		}
 		
 //		float step = this.moveSpeed * delta;
@@ -162,6 +168,22 @@ public class Hero extends Entity
 				this.direction = Direction.EAST;
 //				this.x += step;
 			}
+	}
+	
+	public void checkAttack(LinkedList<Enemy> enemies) 
+	{
+		for(int i = 0; i < enemies.size(); i++)
+		{
+			Enemy e = enemies.get(i);
+			if(intersects(e)) {
+				hit(e.getDamage());
+			}
+		}
+	}
+	
+	public int getHealth() 
+	{
+		return health;
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
@@ -15,6 +16,7 @@ public class World
 	public TiledRoom room;
 	public LinkedList<Enemy> enemies;
 	public Camera camera;
+	private Image happyHeart;
 	
 	public World() throws SlickException
 	{
@@ -28,9 +30,8 @@ public class World
 		 	this.enemies.add(new Thug(this, point.x, point.y));
 		}
 		
-		practiceThug = new Thug(this, 5, 4);
-		
 		this.camera = new Camera(hero);
+		this.happyHeart = new Image("res/heart.png");
 	}
 	
 	public void update(Input input, int delta)
@@ -49,6 +50,9 @@ public class World
 						i--;
 					}
 		}
+		
+		hero.checkAttack(enemies);
+		System.out.println(" hero's health: " + hero.getHealth());
 	}
 	
 	public void render(Graphics graphics)
@@ -58,6 +62,11 @@ public class World
 		for(Enemy enemy : this.enemies)
 		{
 			enemy.render(graphics, camera);
+		}
+		
+		for(int i = 0; i < hero.getHealth(); i++)
+		{
+			happyHeart.draw(50+(10*i), 50);
 		}
 
 		this.hero.render(graphics, camera);
