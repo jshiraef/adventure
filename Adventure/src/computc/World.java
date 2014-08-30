@@ -17,6 +17,7 @@ public class World
 	public LinkedList<Enemy> enemies;
 	public Camera camera;
 	private Image happyHeart;
+	private Image menuBox;
 	
 	public World() throws SlickException
 	{
@@ -32,9 +33,10 @@ public class World
 		
 		this.camera = new Camera(hero);
 		this.happyHeart = new Image("res/heart.png");
+		this.menuBox = new Image("res/textBox.png");
 	}
 	
-	public void update(Input input, int delta)
+	public void update(Input input, int delta) throws SlickException
 	{
 		if(!hero.isDead() == true)
 		{
@@ -57,7 +59,20 @@ public class World
 		System.out.println(" hero's health: " + hero.getHealth());
 		}
 		
-		else System.out.println("reset");
+		else 
+		
+		// menu 
+		if(hero.isDead() == true)
+		{
+			if(input.isKeyDown(Input.KEY_R))
+			{
+				this.hero = new Hero(this, 5, 1);
+				this.camera = new Camera(hero);
+				this.hero.setAlive();
+			}
+			if(input.isKeyDown(Input.KEY_Q))
+				System.exit(0);
+		}
 	}
 	
 	public void render(Graphics graphics)
@@ -71,9 +86,17 @@ public class World
 		
 		for(int i = 0; i < hero.getHealth(); i++)
 		{
-			happyHeart.draw(50+(10*i), 50);
+			happyHeart.draw(50+(10*i), 20);
 		}
 
 		this.hero.render(graphics, camera);
+		
+		if(hero.isDead() == true)
+		{
+			menuBox.draw(Adventure.SCREEN_WIDTH/3, Adventure.SCREEN_HEIGHT/2);
+			graphics.drawString("Restart (R)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 10);
+			graphics.drawString("Main Menu (M)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 30);
+			graphics.drawString("Quit Game (Q)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 50);
+		}
 	}
 }

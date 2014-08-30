@@ -191,4 +191,9 @@ public class Hero extends Entity
 		return dead;
 	}
 	
+	public void setAlive()
+	{
+		dead = false;
+	}
+	
 }
