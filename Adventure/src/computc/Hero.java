@@ -186,4 +186,9 @@ public class Hero extends Entity
 		return health;
 	}
 	
+	public boolean isDead() 
+	{
+		return dead;
+	}
+	
 }

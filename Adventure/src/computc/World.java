@@ -36,23 +36,28 @@ public class World
 	
 	public void update(Input input, int delta)
 	{
-		this.camera.update(delta);
-		this.hero.update(input, delta);
-		
-		// enemies
-		for(int i = 0; i < enemies.size(); i++) 
+		if(!hero.isDead() == true)
 		{
-			Enemy e = enemies.get(i);
-			e.update(delta);
+			this.camera.update(delta);
+			this.hero.update(input, delta);
+		
+			// enemies
+			for(int i = 0; i < enemies.size(); i++) 
+			{
+				Enemy e = enemies.get(i);
+				e.update(delta);
 					if(e.isDead())
 					{
 						enemies.remove(i);
 						i--;
 					}
-		}
+			}
 		
 		hero.checkAttack(enemies);
 		System.out.println(" hero's health: " + hero.getHealth());
+		}
+		
+		else System.out.println("reset");
 	}
 	
 	public void render(Graphics graphics)
