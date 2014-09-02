@@ -72,4 +72,5 @@ public class Camera
 	{
 		this.y -= delta;
 	}
+	
 }

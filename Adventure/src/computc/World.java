@@ -81,7 +81,10 @@ public class World
 		
 		for(Enemy enemy : this.enemies)
 		{
+			if(enemy.isOnScreen(camera) == true)
+			{
 			enemy.render(graphics, camera);
+			}
 		}
 		
 		for(int i = 0; i < hero.getHealth(); i++)

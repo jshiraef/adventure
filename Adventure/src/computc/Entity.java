@@ -241,4 +241,16 @@ public abstract class Entity
 		   bottomRight = world.room.getTile(bottomRow, rightColumn).isBlock;
 		   
 	   }
+	
+	public boolean isOnScreen(Camera camera) 
+	{
+		if((this.getX() >= camera.getX()) && 
+				(this.getY() >= camera.getY()) && 
+				(this.getX() <= camera.getX() + Adventure.SCREEN_WIDTH) && 
+				(this.getY() <= camera.getY() + Adventure.SCREEN_HEIGHT ))
+		{
+			return true;
+		}
+		else return false;
+	}
 }
