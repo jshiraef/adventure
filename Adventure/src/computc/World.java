@@ -93,10 +93,10 @@ public class World
 		
 		if(hero.isDead() == true)
 		{
-			menuBox.draw(Adventure.SCREEN_WIDTH/3, Adventure.SCREEN_HEIGHT/2);
-			graphics.drawString("Restart (R)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 10);
-			graphics.drawString("Main Menu (M)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 30);
-			graphics.drawString("Quit Game (Q)", Adventure.SCREEN_WIDTH/2, Adventure.SCREEN_HEIGHT/2 + 50);
+			menuBox.draw(Adventure.SCREEN_WIDTH/5, Adventure.SCREEN_HEIGHT/3);
+			graphics.drawString("Restart (R)", Adventure.SCREEN_WIDTH/3, Adventure.SCREEN_HEIGHT/3 + 10);
+			graphics.drawString("Main Menu (M)", Adventure.SCREEN_WIDTH/3, Adventure.SCREEN_HEIGHT/3 + 30);
+			graphics.drawString("Quit Game (Q)", Adventure.SCREEN_WIDTH/3, Adventure.SCREEN_HEIGHT/3 + 50);
 		}
 	}
 }
