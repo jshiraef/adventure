@@ -58,6 +58,8 @@ public class Hero extends Entity
 	// movement method
 	private void getNextPosition(Input input, int delta) 
 	{
+		System.out.println(" the dy is: " + dy);
+		System.out.println(" the dx is: " + dx);
 		if(input.isKeyDown(Input.KEY_UP)) 
 		{
 			dy -= acceleration * delta;

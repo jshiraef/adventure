@@ -190,10 +190,10 @@ public abstract class Entity
 	
 	public void calculateCorners(float x, float y) 
 	{
-		   int leftColumn = (int)(x - getHitboxWidth()/ 2);
-		   int rightColumn = (int)(x + getHitboxWidth()/ 2 - 1);
-		   int topRow = (int)(y - getHitboxHeight()/ 2);
-		   int bottomRow = (int)(y + getHitboxHeight()/ 2 - 1);
+		   float leftColumn = (x - getHitboxWidth()/ 2);
+		   float rightColumn = (x + getHitboxWidth()/ 2 - 1);
+		   float topRow = (y - getHitboxHeight()/ 2);
+		   float bottomRow = (y + getHitboxHeight()/ 2 - 1);
 		   
 		   if(leftColumn < 0 || bottomRow >= Dungeon.ROOMY_HEIGHT * Room.HEIGHT || leftColumn < 0 || rightColumn >= Dungeon.ROOMY_WIDTH * Room.WIDTH) 
 		   {
