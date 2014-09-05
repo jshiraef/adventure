@@ -209,6 +209,11 @@ public abstract class Entity
 	
 	public void checkTileMapCollision() 
 	{	   
+		float leftColumn = (x - getHitboxWidth()/ 2 );
+		float rightColumn = (x + getHitboxWidth()/ 2 + 1);
+		float topRow = (y - getHitboxHeight()/ 2 );
+		float bottomRow = (y + getHitboxHeight()/ 2 + 1 );
+		
 		   xdest = x + dx;
 		   ydest = y + dy;
 		   
@@ -221,6 +226,8 @@ public abstract class Entity
 		   {
 			   if(topLeft || topRight) 
 			   {
+//				   ytemp = dungeon.getTile(leftColumn, topRow).getY() + (y - dungeon.getTile(leftColumn, topRow).getY());
+				   ytemp = dungeon.getTile(leftColumn, topRow).getY() + getHitboxHeight()/2;
 				   dy = 0;
 			   }
 			   else {
@@ -228,10 +235,11 @@ public abstract class Entity
 			   }
 		   }
 			   
-			if(dy > 0) 
+		   else if(dy > 0) 
 			{
 				if(bottomLeft || bottomRight) 
 				{
+					ytemp = dungeon.getTile(rightColumn, bottomRow).getY() - getHitboxHeight()/2;
 					dy = 0;
 				}
 				else 
@@ -245,6 +253,7 @@ public abstract class Entity
 			if(dx < 0) {
 				if(topLeft || bottomLeft) 
 				{
+					xtemp = dungeon.getTile(leftColumn, topRow).getX() + getHitboxHeight()/2;
 					dx = 0;
 				}
 				else 
@@ -253,9 +262,10 @@ public abstract class Entity
 				}
 			}
 				
-			if(dx > 0) {
+			else if(dx > 0) {
 				if(topRight || bottomRight) 
 				{
+					xtemp = dungeon.getTile(rightColumn, topRow).getX() - getHitboxHeight()/2;
 					dx = 0;
 				}
 				else 

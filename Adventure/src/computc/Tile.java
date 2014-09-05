@@ -20,8 +20,8 @@ public class Tile
 	
 	public void render(Graphics graphics, Camera camera)
 	{
-		int x = this.getX() + this.room.getX() - camera.getX();
-		int y = this.getY() + this.room.getY() - camera.getY();
+		int x = this.getX() - camera.getX();
+		int y = this.getY() - camera.getY();
 		
 		if(this.isBlocked)
 		{
@@ -35,12 +35,12 @@ public class Tile
 	
 	public int getX()
 	{
-		return this.getTileyX() * this.getWidth();
+		return this.getTileyX() * this.getWidth() + this.room.getX();
 	}
 	
 	public int getY()
 	{
-		return this.getTileyY() * this.getHeight();
+		return this.getTileyY() * this.getHeight()  + this.room.getY();
 	}
 	
 	public int getTileyX()

@@ -127,12 +127,6 @@ public class Dungeon
 		return this.getRoom(rx, ry).getTile(tx, ty);
 	}
 	
-	public Tile getTile(int rx, int ry, int tx, int ty)
-	{
-		return this.getRoom(rx, ry).getTile(tx, ty);
-	}
-//	public 
-	
 	public final static int ROOMY_WIDTH = 9;
 	public final static int ROOMY_HEIGHT = 5;
 }
