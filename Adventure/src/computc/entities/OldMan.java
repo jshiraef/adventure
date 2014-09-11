@@ -29,7 +29,7 @@ public class OldMan extends Entity
 	{
 		if(hero.getRoomyX() == 3 && hero.getRoomyY() == 1 && this.y < Tile.SIZE * 14.5)
 		{
-			this.y += .005 * delta;
+			this.y += .01 * delta;
 		}
 	}
 	

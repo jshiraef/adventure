@@ -112,5 +112,5 @@ public class Thug extends Enemy
 			dy *= delta;
 		}	
 	}
-
+	
 }
