@@ -157,6 +157,16 @@ public abstract class Entity
 		return (int)(Math.floor(this.y / Room.HEIGHT));
 	}
 	
+	public float getRoomPositionX()
+	{
+		return this.x - (Room.WIDTH * this.getRoomyX());
+	}
+	
+	public float getRoomPositionY()
+	{
+		return this.y - (Room.HEIGHT * this.getRoomyY());
+	}
+	
 	public void setX(float x)
 	{
 		this.x = x;
