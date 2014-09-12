@@ -1,5 +1,10 @@
 package computc.worlds;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Graphics;
 
@@ -14,6 +19,10 @@ public class Tile
 	
 	public boolean isBlocked;
 	public boolean isStairs;
+	
+	BodyDef wallBodyDef;
+	Body wallBody;
+	PolygonShape wallShape;
 	
 	public Tile(Room room, int tx, int ty)
 	{
@@ -30,7 +39,13 @@ public class Tile
 		
 		if(this.isBlocked)
 		{
-			Tile.WALL_IMAGE.draw(x, y);
+			Tile.WALL_IMAGE.draw(x/30, y/30);
+			wallBodyDef = new BodyDef();
+		 	wallBodyDef.type = BodyType.STATIC;
+			wallBody = this.room.dungeon.world.createBody(wallBodyDef);
+			wallShape = new PolygonShape();
+			wallShape.setAsBox(2.13f, 2.13f);
+			
 		}
 		else if(this.isStairs)
 		{

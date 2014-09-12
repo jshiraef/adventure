@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -20,6 +22,9 @@ public class Dungeon
 	private HashMap<String, Room> rooms = new HashMap<String, Room>();
 	public LinkedList<Enemy> thugs; 
 	public Point[] thug_positions_in_tiley_coordinates;
+	
+	public World world;
+	public Vec2 gravity = new Vec2(0, .5f);
 	
 	public Dungeon() throws SlickException
 	{
@@ -107,6 +112,8 @@ public class Dungeon
 		}
 		
 		thugs.add(new BigThug(this, 36, 23));
+		
+		this.world = new World(gravity);
 	}
 	
 	public void update(int delta) throws SlickException

@@ -14,7 +14,7 @@ public class Room
 {
 	private int rx, ry;
 	private Tile[][] tiles;
-	private Dungeon dungeon;
+	public Dungeon dungeon;
 	
 	public boolean visited;
 	
