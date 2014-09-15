@@ -187,6 +187,11 @@ public abstract class Entity
 		return this.image.getHeight();
 	}
 	
+	public Room getRoom()
+	{
+		return dungeon.getRoom(this.getRoomyX(), this.getRoomyY());
+	}
+	
 	public int getHalfWidth()
 	{
 		return this.getWidth() / 2;

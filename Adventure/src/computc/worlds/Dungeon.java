@@ -13,9 +13,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -208,6 +211,7 @@ public class Dungeon
 		return this.getRoom(rx, ry).getTile(tx, ty);
 	}
 	
+	// debug mode for viewing box2d physics
 	public void rigidBodyDebugDraw(Set<Body> bodies) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -221,7 +225,15 @@ public class Dungeon
 				glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
 				glRectd(-0.6f * 30, -0.125 * 30, 0.6f * 30, 0.125 * 30);
 	//			System.out.println("the actual box 2d position of the body is: "  + body.getPosition().x + " , " + body.getPosition().y);
-				System.out.println("this is happening");
+				glPopMatrix();
+			}
+			
+			if(body.getType() == BodyType.STATIC) 
+			{
+				glPushMatrix();
+				Vec2 bodyPosition = body.getPosition().mul(30);
+				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
+				glRectd(-1f * 30, -1f * 30, 1f * 30, 1f * 30);
 				glPopMatrix();
 			}
 		}

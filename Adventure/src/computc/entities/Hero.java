@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -29,10 +30,13 @@ import computc.Camera;
 import computc.Direction;
 import computc.worlds.Dungeon;
 import computc.worlds.Room;
+import computc.worlds.Tile;
 
 public class Hero extends Entity
 {
 	private boolean dead = false;
+	
+	private boolean newRoom = false;
 	
 	Image chainLink = new Image("res/links.png");
 	
@@ -44,10 +48,14 @@ public class Hero extends Entity
 	 
 	 private  Set<Body> bodies = new HashSet<Body>();
 	 
-	  BodyDef playerBodyDef, linkBodyDef;
-	  Body playerBody, linkBody;
-	  PolygonShape playerBoxShape, chainLinkShape;
-	 FixtureDef chainProperties;
+	 BodyDef playerBodyDef, linkBodyDef, wallBodyDef;
+	 Body playerBody, linkBody, wallBody;
+	 
+	 // box2d shapes
+	 PolygonShape playerBoxShape, chainLinkShape;
+	 CircleShape wallCollisionShape;
+	 
+	 FixtureDef chainProperties, wallProperties;
 	 RevoluteJointDef joint;
 	 
 	 private float anchorY;
@@ -77,28 +85,28 @@ public class Hero extends Entity
 	 	playerBodyDef.type = BodyType.STATIC;
 		playerBody = world.createBody(playerBodyDef);
 		playerBoxShape = new PolygonShape();
-		playerBoxShape.setAsBox(1.6f, 1.6f);
+		playerBoxShape.setAsBox(0.8f, 0.8f);
 		playerBody.createFixture(playerBoxShape, 0.0f);
 	
 	
 		chainLinkShape = new PolygonShape();
 		chainLinkShape.setAsBox(0.6f, 0.125f);
 		
-		// setup chain Properties ( FixtureDef)
+		// setup chain Properties (FixtureDef)
 		chainProperties = new FixtureDef();
 		chainProperties.shape = chainLinkShape;
 		chainProperties.density = 20.0f;
-		chainProperties.friction = 0.2f;
+		chainProperties.friction = 0.02f;
 					
 		// joint setup
 		joint = new RevoluteJointDef();
 		joint.collideConnected = false;
-		anchorY = this.getRoomPositionY()/30f;
+		anchorY = this.getRoomPositionY()/30 - 3f;
 		Body prevBody = playerBody;
 		bodies.add(playerBody);
 		
 		// make chain links
-		for (float i = this.getRoomPositionX()/30; i < this.getRoomPositionY()/30 + 15; i++)
+		for (float i = this.getRoomPositionX()/30 - 12; i < this.getRoomPositionY()/30; i++)
 		{
 			linkBodyDef = new BodyDef();
 			linkBodyDef.type = BodyType.DYNAMIC;
@@ -129,7 +137,7 @@ public class Hero extends Entity
 				{
 					Vec2 bodyPosition = body.getPosition().mul(30);
 					chainLink.draw(bodyPosition.x, bodyPosition.y);
-					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
+//					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
 					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
 				}
 			}
@@ -151,8 +159,15 @@ public class Hero extends Entity
 	
 	public void update(Input input, int delta)
 	{
+//		System.out.println("the room location is: " + this.getRoomPositionX() + " , " + this.getRoomPositionY());
+//		System.out.println("the room's location is " + dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX() + " , " + dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY());
+//		System.out.println("the playerBody's location in PIXELS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX() + playerBody.getPosition().x * 30) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY() + playerBody.getPosition().y * 30));
+//		System.out.println("the playerBody's location in METERS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX()/30 + playerBody.getPosition().x) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY()/30 + playerBody.getPosition().y));
+//		System.out.println(" the playerBody location is: " + playerBody.getPosition().x * 30 + " , " + playerBody.getPosition().y * 30); 
+		
+		
 		// converts box2d position to hero's position on screen
-		Vec2 box2DplayerPosition = new Vec2(this.getRoomPositionX()/30 - 12, this.getRoomPositionY()/30 - 4);
+		Vec2 box2DplayerPosition = new Vec2(this.getRoomPositionX()/30, this.getRoomPositionY()/30);
 				
 		// binds the chain to the hero's position
 		playerBody.setTransform(box2DplayerPosition, 0);
@@ -295,6 +310,45 @@ public class Hero extends Entity
 			{
 				this.dungeon.toggleDebugDraw();
 			}
+			
+			if(dx > 0 || dx < 0 || dy > 0 || dy < 0)
+			{
+				
+				if(!newRoom)
+				{
+				loadRoomRigidBodies();
+				newRoom = true;
+				System.out.println("This should only happen once!");
+				}
+				
+			}
+	}
+	
+	// give walls rigidbodies for the chain to collide with
+	public void loadRoomRigidBodies()
+	{
+		for (int i = 0; i < Room.TILEY_WIDTH; i++)
+		{
+			for(int j = 0; j < Room.TILEY_HEIGHT; j++) 
+			{
+				if(this.getRoom().getTile((float)64*i, (float)64*j).isBlocked)
+				{
+				wallBodyDef = new BodyDef();
+				wallBodyDef.type = BodyType.STATIC;
+				wallCollisionShape = new CircleShape();
+				wallCollisionShape.setRadius(1.1f);
+				wallBody = world.createBody(wallBodyDef);
+				wallProperties = new FixtureDef();
+				wallProperties.density = 1;
+				wallProperties.restitution = .3f;
+				wallProperties.shape = wallCollisionShape;
+				wallBody.createFixture(wallProperties);
+				Vec2 roomPosition = new Vec2((2.15f * i) + 1,(2.15f * j) + 1);
+				wallBody.setTransform(roomPosition, 0);
+				bodies.add(wallBody);
+				}
+			}
+		}
 	}
 	
 	private void hit(int damage)

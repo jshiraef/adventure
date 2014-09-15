@@ -37,7 +37,7 @@ public class MainGameState extends BasicGameState
 	public void init(GameContainer container, StateBasedGame game) throws SlickException
 	{
 		this.dungeon = new Dungeon();
-		this.hero = new Hero(dungeon, dungeon.getRoom(3, 0), 5, 1);
+		this.hero = new Hero(dungeon, dungeon.getRoom(4, 0), 5, 1);
 		this.oldman = new OldMan(dungeon, hero, 38, 12);
 		this.camera = new Camera(hero);
 		this.menu = new Menu(dungeon, hero);
@@ -74,7 +74,7 @@ public class MainGameState extends BasicGameState
 			if(input.isKeyDown(Input.KEY_R))
 			{
 				Game.reset = true;
-				this.hero = new Hero(dungeon, dungeon.getRoom(3, 0), 5, 1);
+				this.hero = new Hero(dungeon, dungeon.getRoom(4, 0), 5, 1);
 				this.camera = new Camera(hero);
 				this.hero.setAlive();
 			}
