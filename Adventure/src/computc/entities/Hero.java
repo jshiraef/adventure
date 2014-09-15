@@ -40,13 +40,13 @@ public class Hero extends Entity
 	
 	private int roomLoadingCooldown;
 	
-	Image chainLink = new Image("res/links.png");
+	Image chainLink = new Image("res/links2.png");
 	
 	
 	// box2d "world"
 	 private World world;
 	 private final Vec2 gravity = new Vec2(0, .5f);
-	 private  Set<Body> bodies = new HashSet<Body>();
+	 public  Set<Body> bodies = new HashSet<Body>();
 	 private  Set<Body> staticBodies = new HashSet<Body>();
 	 
 	 // box2d BodyDefinitions
@@ -98,9 +98,9 @@ public class Hero extends Entity
 				if(body.getType() == BodyType.DYNAMIC) 
 				{
 					Vec2 bodyPosition = body.getPosition().mul(30);
-					chainLink.draw(bodyPosition.x, bodyPosition.y);
+					chainLink.draw(bodyPosition.x - 5, bodyPosition.y - 5);
 //					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
-//					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
+					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
 				}
 			}
 		}
@@ -255,8 +255,8 @@ public class Hero extends Entity
 		
 			if(input.isKeyDown(Input.KEY_UP))
 				{
-					this.direction = Direction.NORTH;
-//					this.y -= step;
+				this.direction = Direction.NORTH;
+//				this.y -= step;
 				}
 			else if(input.isKeyDown(Input.KEY_DOWN))
 				{
@@ -324,13 +324,7 @@ public class Hero extends Entity
 	
 	// destroy all static rigidBodies
 	public void destroyRoomRigidBodies()
-	{
-//		for(Body body: bodies)
-//		{
-//			world.destroyBody(body);
-//		}
-//		bodies.clear();
-		
+	{	
 		for(Body body: staticBodies)
 		{
 			world.destroyBody(body);
@@ -349,13 +343,13 @@ public class Hero extends Entity
 			playerBody.createFixture(playerBoxShape, 0.0f);
 			
 			chainLinkShape = new PolygonShape();
-			chainLinkShape.setAsBox(0.6f, 0.125f);
+			chainLinkShape.setAsBox(0.3f, 0.060f);
 				
 		// setup chain Properties (FixtureDef)
 			chainProperties = new FixtureDef();
 			chainProperties.shape = chainLinkShape;
-			chainProperties.density = 20.0f;
-			chainProperties.friction = 0.02f;
+			chainProperties.density = 1.0f;
+			chainProperties.friction = 0.002f;
 							
 		// joint setup
 			joint = new RevoluteJointDef();
@@ -436,6 +430,11 @@ public class Hero extends Entity
 	public void setNewRoom()
 	{
 		newRoom = true;
+	}
+	
+	public World getWorld()
+	{
+		return world;
 	}
 	
 	private float speed = 0.25f;

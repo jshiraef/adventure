@@ -1,5 +1,7 @@
 package computc.states;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -12,6 +14,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import computc.Camera;
+import computc.Direction;
 import computc.Game;
 import computc.Menu;
 import computc.entities.Hero;
@@ -33,6 +36,9 @@ public class MainGameState extends BasicGameState
 	Animation textBox;
 	public Color textColor = Color.white;
 	private boolean nextLevel = false;
+	
+	private int gravityCoolDown;
+	char q = 'q';
 	
 	public void init(GameContainer container, StateBasedGame game) throws SlickException
 	{
@@ -83,6 +89,35 @@ public class MainGameState extends BasicGameState
 				System.exit(0);
 			}
 		}
+		
+			if(input.isKeyDown(Input.KEY_UP))
+			{
+				this.hero.getWorld().setGravity(new Vec2(0, 1f));
+				
+			}
+			else if(input.isKeyDown(Input.KEY_DOWN))
+			{
+				this.hero.getWorld().setGravity(new Vec2(0, -1f));
+			}
+
+			if(input.isKeyDown(Input.KEY_LEFT))
+			{
+				this.hero.getWorld().setGravity(new Vec2(1f, 0));
+			}
+			else if(input.isKeyDown(Input.KEY_RIGHT))
+			{
+				this.hero.getWorld().setGravity(new Vec2(-1f, 0));
+			}
+			
+			else for(Body body: hero.bodies)
+			{
+				body.setLinearDamping(10);
+			}
+			
+			if(gravityCoolDown != 0)
+			{
+				gravityCoolDown--;
+			}
 	}
 	
 	public void render(GameContainer container, StateBasedGame game, Graphics graphics) throws SlickException
@@ -115,6 +150,30 @@ public class MainGameState extends BasicGameState
 	public int getID()
 	{
 		return MainGameState.ID;
+	}
+	
+	@Override
+	public void keyReleased(int k, char c)
+	{
+		if(k == Input.KEY_UP)
+		{
+			
+		}
+		
+		if(k == Input.KEY_DOWN)
+		{
+			
+		}
+		
+		if(k == Input.KEY_LEFT)
+		{
+			
+		}
+		
+		if(k == Input.KEY_RIGHT)
+		{
+			
+		}
 	}
 	
 	public static final int ID = 0;

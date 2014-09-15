@@ -222,7 +222,7 @@ public class Dungeon
 				Vec2 bodyPosition = body.getPosition().mul(30);
 				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
 				glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
-				glRectd(-0.6f * 30, -0.125 * 30, 0.6f * 30, 0.125 * 30);
+				glRectd(-0.3f * 30, -0.060f * 30, 0.3f * 30, 0.060f * 30);
 	//			System.out.println("the actual box 2d position of the body is: "  + body.getPosition().x + " , " + body.getPosition().y);
 				glPopMatrix();
 		}
