@@ -39,12 +39,7 @@ public class Tile
 		
 		if(this.isBlocked)
 		{
-			Tile.WALL_IMAGE.draw(x/30, y/30);
-			wallBodyDef = new BodyDef();
-		 	wallBodyDef.type = BodyType.STATIC;
-			wallBody = this.room.dungeon.world.createBody(wallBodyDef);
-			wallShape = new PolygonShape();
-			wallShape.setAsBox(2.13f, 2.13f);
+			Tile.WALL_IMAGE.draw(x, y);
 			
 		}
 		else if(this.isStairs)

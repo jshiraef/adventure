@@ -1,10 +1,21 @@
 package computc.worlds;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRectd;
+import static org.lwjgl.opengl.GL11.glRotated;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -25,6 +36,8 @@ public class Dungeon
 	
 	public World world;
 	public Vec2 gravity = new Vec2(0, .5f);
+	
+	public boolean debug = false;
 	
 	public Dungeon() throws SlickException
 	{
@@ -193,5 +206,34 @@ public class Dungeon
 		int ty = (int)(Math.floor((y - (ry * Room.HEIGHT)) / Tile.SIZE));
 		
 		return this.getRoom(rx, ry).getTile(tx, ty);
+	}
+	
+	public void rigidBodyDebugDraw(Set<Body> bodies) 
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		for(Body body: bodies)
+		{
+			if(body.getType() == BodyType.DYNAMIC) 
+			{
+				glPushMatrix();
+				Vec2 bodyPosition = body.getPosition().mul(30);
+				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
+				glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
+				glRectd(-0.6f * 30, -0.125 * 30, 0.6f * 30, 0.125 * 30);
+	//			System.out.println("the actual box 2d position of the body is: "  + body.getPosition().x + " , " + body.getPosition().y);
+				System.out.println("this is happening");
+				glPopMatrix();
+			}
+		}
+	}
+	
+	public boolean toggleDebugDraw()
+	{
+		return debug = !debug;
+	}
+	
+	public boolean getDebugDraw()
+	{
+		return debug;
 	}
 }

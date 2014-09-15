@@ -1,5 +1,13 @@
 package computc.entities;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRectd;
+import static org.lwjgl.opengl.GL11.glRotated;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -87,6 +95,7 @@ public class Hero extends Entity
 		joint.collideConnected = false;
 		anchorY = this.getRoomPositionY()/30f;
 		Body prevBody = playerBody;
+		bodies.add(playerBody);
 		
 		// make chain links
 		for (float i = this.getRoomPositionX()/30; i < this.getRoomPositionY()/30 + 15; i++)
@@ -109,17 +118,25 @@ public class Hero extends Entity
 	
 	public void render(Graphics graphics, Camera camera)
 	{
-		// draw chain - chain link rotation needs work
-		for(Body body: bodies)
+		super.render(graphics, camera);
+		
+		if(!this.dungeon.getDebugDraw())
 		{
-			if(body.getType() == BodyType.DYNAMIC) 
+			// draw chain - chain link rotation needs work
+			for(Body body: bodies)
 			{
-				Vec2 bodyPosition = body.getPosition().mul(30);
-				chainLink.draw(bodyPosition.x, bodyPosition.y);
-				System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
-				chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
+				if(body.getType() == BodyType.DYNAMIC) 
+				{
+					Vec2 bodyPosition = body.getPosition().mul(30);
+					chainLink.draw(bodyPosition.x, bodyPosition.y);
+					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
+					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
+				}
 			}
 		}
+		
+		// draw debug mode
+		else this.dungeon.rigidBodyDebugDraw(bodies);
 		
 		if(blinking) 
 		{
@@ -128,10 +145,8 @@ public class Hero extends Entity
 				return;
 			}
 		}
-		
-		
 			
-		super.render(graphics, camera);
+		
 	}
 	
 	public void update(Input input, int delta)
@@ -274,6 +289,11 @@ public class Hero extends Entity
 			{
 				this.direction = Direction.EAST;
 //				this.x += step;
+			}
+			
+			if(input.isKeyDown(Input.KEY_D))
+			{
+				this.dungeon.toggleDebugDraw();
 			}
 	}
 	
