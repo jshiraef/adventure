@@ -36,27 +36,28 @@ public class Hero extends Entity
 {
 	private boolean dead = false;
 	
-	private boolean newRoom = false;
+	private boolean newRoom = true;
+	
+	private int roomLoadingCooldown;
 	
 	Image chainLink = new Image("res/links.png");
 	
 	
 	// box2d "world"
 	 private World world;
-	 
 	 private final Vec2 gravity = new Vec2(0, .5f);
-	 
 	 private  Set<Body> bodies = new HashSet<Body>();
+	 private  Set<Body> staticBodies = new HashSet<Body>();
 	 
+	 // box2d BodyDefinitions
 	 BodyDef playerBodyDef, linkBodyDef, wallBodyDef;
 	 Body playerBody, linkBody, wallBody;
+	 FixtureDef chainProperties, wallProperties;
+	 RevoluteJointDef joint;
 	 
 	 // box2d shapes
 	 PolygonShape playerBoxShape, chainLinkShape;
 	 CircleShape wallCollisionShape;
-	 
-	 FixtureDef chainProperties, wallProperties;
-	 RevoluteJointDef joint;
 	 
 	 private float anchorY;
 	 private Vec2 anchor;
@@ -80,47 +81,8 @@ public class Hero extends Entity
 		
 		playerBody = null;
 		
-		// setup Player's box2d body 
-	 	playerBodyDef = new BodyDef();
-	 	playerBodyDef.type = BodyType.STATIC;
-		playerBody = world.createBody(playerBodyDef);
-		playerBoxShape = new PolygonShape();
-		playerBoxShape.setAsBox(0.8f, 0.8f);
-		playerBody.createFixture(playerBoxShape, 0.0f);
-	
-	
-		chainLinkShape = new PolygonShape();
-		chainLinkShape.setAsBox(0.6f, 0.125f);
+		setupChain();
 		
-		// setup chain Properties (FixtureDef)
-		chainProperties = new FixtureDef();
-		chainProperties.shape = chainLinkShape;
-		chainProperties.density = 20.0f;
-		chainProperties.friction = 0.02f;
-					
-		// joint setup
-		joint = new RevoluteJointDef();
-		joint.collideConnected = false;
-		anchorY = this.getRoomPositionY()/30 - 3f;
-		Body prevBody = playerBody;
-		bodies.add(playerBody);
-		
-		// make chain links
-		for (float i = this.getRoomPositionX()/30 - 12; i < this.getRoomPositionY()/30; i++)
-		{
-			linkBodyDef = new BodyDef();
-			linkBodyDef.type = BodyType.DYNAMIC;
-			linkBodyDef.position.set(0.5f + i, anchorY);
-			linkBody = world.createBody(linkBodyDef);	
-			linkBody.createFixture(chainProperties);
-			anchor = new Vec2(i, anchorY);
-			
-			// initialize joint
-			joint.initialize(prevBody, linkBody, anchor);
-			world.createJoint(joint);
-			prevBody = linkBody;
-			bodies.add(linkBody);
-		}
 		
 	}
 	
@@ -138,13 +100,13 @@ public class Hero extends Entity
 					Vec2 bodyPosition = body.getPosition().mul(30);
 					chainLink.draw(bodyPosition.x, bodyPosition.y);
 //					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
-					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
+//					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
 				}
 			}
 		}
 		
 		// draw debug mode
-		else this.dungeon.rigidBodyDebugDraw(bodies);
+		else this.dungeon.rigidBodyDebugDraw(bodies, staticBodies);
 		
 		if(blinking) 
 		{
@@ -155,16 +117,23 @@ public class Hero extends Entity
 		}
 			
 		
+		if(camera.getX() != this.getRoom().getX() || camera.getY() != this.getRoom().getY())
+		{
+			if(roomLoadingCooldown <= 0)
+			{
+				newRoom = true;
+				roomLoadingCooldown = 200;
+			}
+			roomLoadingCooldown--;
+		}
+		else roomLoadingCooldown = 0;
 	}
 	
 	public void update(Input input, int delta)
 	{
-//		System.out.println("the room location is: " + this.getRoomPositionX() + " , " + this.getRoomPositionY());
-//		System.out.println("the room's location is " + dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX() + " , " + dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY());
 //		System.out.println("the playerBody's location in PIXELS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX() + playerBody.getPosition().x * 30) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY() + playerBody.getPosition().y * 30));
 //		System.out.println("the playerBody's location in METERS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX()/30 + playerBody.getPosition().x) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY()/30 + playerBody.getPosition().y));
-//		System.out.println(" the playerBody location is: " + playerBody.getPosition().x * 30 + " , " + playerBody.getPosition().y * 30); 
-		
+	
 		
 		// converts box2d position to hero's position on screen
 		Vec2 box2DplayerPosition = new Vec2(this.getRoomPositionX()/30, this.getRoomPositionY()/30);
@@ -314,10 +283,10 @@ public class Hero extends Entity
 			if(dx > 0 || dx < 0 || dy > 0 || dy < 0)
 			{
 				
-				if(!newRoom)
+				if(newRoom)
 				{
 				loadRoomRigidBodies();
-				newRoom = true;
+				newRoom = false;
 				System.out.println("This should only happen once!");
 				}
 				
@@ -327,6 +296,8 @@ public class Hero extends Entity
 	// give walls rigidbodies for the chain to collide with
 	public void loadRoomRigidBodies()
 	{
+		destroyRoomRigidBodies();
+		
 		for (int i = 0; i < Room.TILEY_WIDTH; i++)
 		{
 			for(int j = 0; j < Room.TILEY_HEIGHT; j++) 
@@ -345,10 +316,70 @@ public class Hero extends Entity
 				wallBody.createFixture(wallProperties);
 				Vec2 roomPosition = new Vec2((2.15f * i) + 1,(2.15f * j) + 1);
 				wallBody.setTransform(roomPosition, 0);
-				bodies.add(wallBody);
+				staticBodies.add(wallBody);
 				}
 			}
 		}
+	}
+	
+	// destroy all static rigidBodies
+	public void destroyRoomRigidBodies()
+	{
+//		for(Body body: bodies)
+//		{
+//			world.destroyBody(body);
+//		}
+//		bodies.clear();
+		
+		for(Body body: staticBodies)
+		{
+			world.destroyBody(body);
+		}
+		staticBodies.clear();
+	}
+	
+	public void setupChain()
+	{
+		// setup Player's box2d body 
+			playerBodyDef = new BodyDef();
+			playerBodyDef.type = BodyType.STATIC;
+			playerBody = world.createBody(playerBodyDef);
+			playerBoxShape = new PolygonShape();
+			playerBoxShape.setAsBox(0.8f, 0.8f);
+			playerBody.createFixture(playerBoxShape, 0.0f);
+			
+			chainLinkShape = new PolygonShape();
+			chainLinkShape.setAsBox(0.6f, 0.125f);
+				
+		// setup chain Properties (FixtureDef)
+			chainProperties = new FixtureDef();
+			chainProperties.shape = chainLinkShape;
+			chainProperties.density = 20.0f;
+			chainProperties.friction = 0.02f;
+							
+		// joint setup
+			joint = new RevoluteJointDef();
+			joint.collideConnected = false;
+			anchorY = this.getRoomPositionY()/30 - 3f;
+			Body prevBody = playerBody;
+			bodies.add(playerBody);
+				
+		// make chain links
+			for (float i = this.getRoomPositionX()/30 - 12; i < this.getRoomPositionY()/30; i++)
+				{
+					linkBodyDef = new BodyDef();
+					linkBodyDef.type = BodyType.DYNAMIC;
+					linkBodyDef.position.set(0.5f + i, anchorY);
+					linkBody = world.createBody(linkBodyDef);	
+					linkBody.createFixture(chainProperties);
+					anchor = new Vec2(i, anchorY);
+					
+					// initialize joint
+					joint.initialize(prevBody, linkBody, anchor);
+					world.createJoint(joint);
+					prevBody = linkBody;
+					bodies.add(linkBody);
+				}
 	}
 	
 	private void hit(int damage)
@@ -400,6 +431,11 @@ public class Hero extends Entity
 	public void setAlive()
 	{
 		dead = false;
+	}
+	
+	public void setNewRoom()
+	{
+		newRoom = true;
 	}
 	
 	private float speed = 0.25f;

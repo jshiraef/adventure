@@ -212,13 +212,12 @@ public class Dungeon
 	}
 	
 	// debug mode for viewing box2d physics
-	public void rigidBodyDebugDraw(Set<Body> bodies) 
+	public void rigidBodyDebugDraw(Set<Body> bodies, Set<Body> staticBodies) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
+		
 		for(Body body: bodies)
 		{
-			if(body.getType() == BodyType.DYNAMIC) 
-			{
 				glPushMatrix();
 				Vec2 bodyPosition = body.getPosition().mul(30);
 				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
@@ -226,16 +225,15 @@ public class Dungeon
 				glRectd(-0.6f * 30, -0.125 * 30, 0.6f * 30, 0.125 * 30);
 	//			System.out.println("the actual box 2d position of the body is: "  + body.getPosition().x + " , " + body.getPosition().y);
 				glPopMatrix();
-			}
-			
-			if(body.getType() == BodyType.STATIC) 
-			{
+		}
+		
+		for(Body body: staticBodies)
+		{
 				glPushMatrix();
-				Vec2 bodyPosition = body.getPosition().mul(30);
-				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
+				Vec2 staticBodyPosition = body.getPosition().mul(30);
+				glTranslatef(staticBodyPosition.x, staticBodyPosition.y, 0);
 				glRectd(-1f * 30, -1f * 30, 1f * 30, 1f * 30);
 				glPopMatrix();
-			}
 		}
 	}
 	
