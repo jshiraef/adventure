@@ -21,6 +21,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -50,8 +51,8 @@ public class Hero extends Entity
 	 private  Set<Body> staticBodies = new HashSet<Body>();
 	 
 	 // box2d BodyDefinitions
-	 BodyDef playerBodyDef, linkBodyDef, wallBodyDef;
-	 Body playerBody, linkBody, wallBody;
+	 BodyDef playerBodyDef, linkBodyDef, lastLinkBodyDef, wallBodyDef;
+	 Body playerBody, linkBody, lastLinkBody, wallBody;
 	 FixtureDef chainProperties, wallProperties;
 	 RevoluteJointDef joint;
 	 
@@ -71,7 +72,7 @@ public class Hero extends Entity
 		this.deacceleration = 0.02f;
 		this.maximumVelocity = 3f;
 		
-		this.currentHealth = this.maximumHealth = 3;
+		this.currentHealth = this.maximumHealth = 15;
 		
 		this.image = new Image("res/hero.png");
 		
@@ -140,6 +141,28 @@ public class Hero extends Entity
 				
 		// binds the chain to the hero's position
 		playerBody.setTransform(box2DplayerPosition, 0);
+		
+		
+		if(Mouse.isButtonDown(0)) 
+		{
+			if(Mouse.getX() > this.getRoomPositionX())
+			{
+			  Vec2 mousePosition = new Vec2(Mouse.getX() + 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
+			  Vec2 playerPosition = new Vec2(playerBody.getPosition());
+			  Vec2 force = mousePosition.sub(playerPosition);
+			  lastLinkBody.applyForce(force,  lastLinkBody.getPosition());
+			}
+			else
+			{
+				Vec2 mousePosition = new Vec2(Mouse.getX() - 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
+				Vec2 playerPosition = new Vec2(playerBody.getPosition());
+				Vec2 force = mousePosition.sub(playerPosition);
+				lastLinkBody.applyForce(force,  lastLinkBody.getPosition());
+			}
+		 }
+		
+		System.out.println("mouse position is: " + Mouse.getX());
+		
 					
 		// the update method for the box2d world
 		world.step(1/60f, 8, 3);
@@ -287,7 +310,6 @@ public class Hero extends Entity
 				{
 				loadRoomRigidBodies();
 				newRoom = false;
-				System.out.println("This should only happen once!");
 				}
 				
 			}
@@ -361,6 +383,23 @@ public class Hero extends Entity
 		// make chain links
 			for (float i = this.getRoomPositionX()/30 - 12; i < this.getRoomPositionY()/30; i++)
 				{
+					if(i >= this.getRoomPositionY()/30 - 1)
+					{
+						lastLinkBodyDef = new BodyDef();
+						lastLinkBodyDef.type = BodyType.DYNAMIC;
+						lastLinkBodyDef.position.set(0.5f + i, anchorY);
+						lastLinkBody = world.createBody(lastLinkBodyDef);
+						lastLinkBody.createFixture(chainProperties);
+						anchor = new Vec2(i, anchorY);
+						
+						joint.initialize(prevBody, lastLinkBody, anchor);
+						world.createJoint(joint);
+						prevBody = linkBody;
+						bodies.add(lastLinkBody);
+						System.out.println("This did happen!");
+					}
+					else
+					{
 					linkBodyDef = new BodyDef();
 					linkBodyDef.type = BodyType.DYNAMIC;
 					linkBodyDef.position.set(0.5f + i, anchorY);
@@ -373,6 +412,7 @@ public class Hero extends Entity
 					world.createJoint(joint);
 					prevBody = linkBody;
 					bodies.add(linkBody);
+					}
 				}
 	}
 	
