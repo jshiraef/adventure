@@ -157,6 +157,16 @@ public abstract class Entity
 		return (int)(Math.floor(this.y / Room.HEIGHT));
 	}
 	
+	public float getLocalX(Camera camera)
+	{
+		return this.getX() - this.getHalfWidth() - camera.getX();
+	}
+	
+	public float getLocalY(Camera camera)
+	{
+		return this.getY() - this.getHalfHeight() - camera.getY();
+	}
+	
 	public float getRoomPositionX()
 	{
 		return this.x - (Room.WIDTH * this.getRoomyX());

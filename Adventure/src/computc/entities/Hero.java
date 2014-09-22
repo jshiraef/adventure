@@ -39,9 +39,12 @@ public class Hero extends Entity
 	
 	private boolean newRoom = true;
 	
+	private boolean transition = true;
+	
 	private int roomLoadingCooldown;
 	
 	Image chainLink = new Image("res/links2.png");
+	Image ironBall = new Image("res/ironball.png");
 	
 	
 	// box2d "world"
@@ -49,6 +52,7 @@ public class Hero extends Entity
 	 private final Vec2 gravity = new Vec2(0, .5f);
 	 public  Set<Body> bodies = new HashSet<Body>();
 	 private  Set<Body> staticBodies = new HashSet<Body>();
+	 private Set<BodyDef> bodyDefinitions = new HashSet<BodyDef>();
 	 
 	 // box2d BodyDefinitions
 	 BodyDef playerBodyDef, linkBodyDef, lastLinkBodyDef, wallBodyDef;
@@ -62,6 +66,7 @@ public class Hero extends Entity
 	 
 	 private float anchorY;
 	 private Vec2 anchor;
+	 private Vec2 box2dPlayerPosition, chainTrailingPosition;
 	
 	public Hero(Dungeon dungeon, Room room, int tx, int ty) throws SlickException
 	{
@@ -96,14 +101,17 @@ public class Hero extends Entity
 			// draw chain - chain link rotation needs work
 			for(Body body: bodies)
 			{
-				if(body.getType() == BodyType.DYNAMIC) 
+				if(body.getType() == BodyType.DYNAMIC || body.getType() == BodyType.STATIC) 
 				{
 					Vec2 bodyPosition = body.getPosition().mul(30);
-					chainLink.draw(bodyPosition.x - 5, bodyPosition.y - 5);
-//					System.out.println("the link should be drawn at" + bodyPosition.x + " , " + bodyPosition.y);
+					if(!transition)
+					{
+					chainLink.draw(bodyPosition.x, bodyPosition.y);
+					}
 					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
 				}
 			}
+			ironBall.draw(lastLinkBody.getPosition().x * 30, lastLinkBody.getPosition().y * 30);
 		}
 		
 		// draw debug mode
@@ -124,23 +132,37 @@ public class Hero extends Entity
 			{
 				newRoom = true;
 				roomLoadingCooldown = 200;
+				
 			}
 			roomLoadingCooldown--;
+			
+			transition = true;
+			lastLinkBody.setType(BodyType.STATIC);
 		}
-		else roomLoadingCooldown = 0;
+		else 
+		{
+			roomLoadingCooldown = 0;	
+			transition = false;
+			lastLinkBody.setType(BodyType.DYNAMIC);
+			
+		}
+		
+		// converts box2d position to hero's position on screen
+		box2dPlayerPosition = new Vec2(this.getLocalX(camera)/30, this.getLocalY(camera)/30);
 	}
 	
 	public void update(Input input, int delta)
-	{
-//		System.out.println("the playerBody's location in PIXELS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX() + playerBody.getPosition().x * 30) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY() + playerBody.getPosition().y * 30));
-//		System.out.println("the playerBody's location in METERS, relative to the entire dungeon: " + (dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).getX()/30 + playerBody.getPosition().x) + " , " + (dungeon.getRoom(this.getRoomyX(),  this.getRoomyY()).getY()/30 + playerBody.getPosition().y));
-	
-		
-		// converts box2d position to hero's position on screen
-		Vec2 box2DplayerPosition = new Vec2(this.getRoomPositionX()/30, this.getRoomPositionY()/30);
-				
+	{						
 		// binds the chain to the hero's position
-		playerBody.setTransform(box2DplayerPosition, 0);
+		playerBody.setTransform(box2dPlayerPosition, 0);
+		
+		if(transition)
+		{
+			for(Body body: bodies)
+			{
+				body.setTransform(box2dPlayerPosition, 0);
+			}
+		}
 		
 		
 		if(Mouse.isButtonDown(0)) 
@@ -161,7 +183,7 @@ public class Hero extends Entity
 			}
 		 }
 		
-		System.out.println("mouse position is: " + Mouse.getX());
+//		System.out.println("mouse position is: " + Mouse.getX());
 		
 					
 		// the update method for the box2d world
@@ -329,7 +351,7 @@ public class Hero extends Entity
 				wallBodyDef = new BodyDef();
 				wallBodyDef.type = BodyType.STATIC;
 				wallCollisionShape = new CircleShape();
-				wallCollisionShape.setRadius(1.1f);
+				wallCollisionShape.setRadius(.8f);
 				wallBody = world.createBody(wallBodyDef);
 				wallProperties = new FixtureDef();
 				wallProperties.density = 1;
@@ -358,14 +380,14 @@ public class Hero extends Entity
 	{
 		// setup Player's box2d body 
 			playerBodyDef = new BodyDef();
-			playerBodyDef.type = BodyType.STATIC;
+			playerBodyDef.type = BodyType.KINEMATIC;
 			playerBody = world.createBody(playerBodyDef);
 			playerBoxShape = new PolygonShape();
 			playerBoxShape.setAsBox(0.8f, 0.8f);
 			playerBody.createFixture(playerBoxShape, 0.0f);
 			
 			chainLinkShape = new PolygonShape();
-			chainLinkShape.setAsBox(0.3f, 0.060f);
+			chainLinkShape.setAsBox(0.5f, 0.060f);
 				
 		// setup chain Properties (FixtureDef)
 			chainProperties = new FixtureDef();
@@ -383,11 +405,11 @@ public class Hero extends Entity
 		// make chain links
 			for (float i = this.getRoomPositionX()/30 - 12; i < this.getRoomPositionY()/30; i++)
 				{
-					if(i >= this.getRoomPositionY()/30 - 1)
+					if(i >= this.getRoomPositionY()/30 - 2)
 					{
 						lastLinkBodyDef = new BodyDef();
 						lastLinkBodyDef.type = BodyType.DYNAMIC;
-						lastLinkBodyDef.position.set(0.5f + i, anchorY);
+						lastLinkBodyDef.position.set(0.2f + i, anchorY);
 						lastLinkBody = world.createBody(lastLinkBodyDef);
 						lastLinkBody.createFixture(chainProperties);
 						anchor = new Vec2(i, anchorY);
@@ -396,13 +418,12 @@ public class Hero extends Entity
 						world.createJoint(joint);
 						prevBody = linkBody;
 						bodies.add(lastLinkBody);
-						System.out.println("This did happen!");
 					}
 					else
 					{
 					linkBodyDef = new BodyDef();
 					linkBodyDef.type = BodyType.DYNAMIC;
-					linkBodyDef.position.set(0.5f + i, anchorY);
+					linkBodyDef.position.set(0.2f + i, anchorY);
 					linkBody = world.createBody(linkBodyDef);	
 					linkBody.createFixture(chainProperties);
 					anchor = new Vec2(i, anchorY);

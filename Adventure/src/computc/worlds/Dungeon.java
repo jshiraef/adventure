@@ -37,7 +37,6 @@ public class Dungeon
 	public LinkedList<Enemy> thugs; 
 	public Point[] thug_positions_in_tiley_coordinates;
 	
-	public World world;
 	public Vec2 gravity = new Vec2(0, .5f);
 	
 	public boolean debug = false;
@@ -129,7 +128,6 @@ public class Dungeon
 		
 		thugs.add(new BigThug(this, 36, 23));
 		
-		this.world = new World(gravity);
 	}
 	
 	public void update(int delta) throws SlickException
@@ -222,7 +220,7 @@ public class Dungeon
 				Vec2 bodyPosition = body.getPosition().mul(30);
 				glTranslatef(bodyPosition.x, bodyPosition.y, 0);
 				glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
-				glRectd(-0.3f * 30, -0.060f * 30, 0.3f * 30, 0.060f * 30);
+				glRectd(-0.5f * 30, -0.060f * 30, 0.5f * 30, 0.060f * 30);
 	//			System.out.println("the actual box 2d position of the body is: "  + body.getPosition().x + " , " + body.getPosition().y);
 				glPopMatrix();
 		}

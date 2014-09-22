@@ -38,7 +38,6 @@ public class MainGameState extends BasicGameState
 	private boolean nextLevel = false;
 	
 	private int gravityCoolDown;
-	char q = 'q';
 	
 	public void init(GameContainer container, StateBasedGame game) throws SlickException
 	{
