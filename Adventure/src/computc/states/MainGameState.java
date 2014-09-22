@@ -2,6 +2,7 @@ package computc.states;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -150,6 +151,28 @@ public class MainGameState extends BasicGameState
 	{
 		return MainGameState.ID;
 	}
+	@Override
+	
+	public void keyPressed(int k, char c)
+	{
+		if(k == Input.KEY_W)
+		{
+			if(Mouse.getX() > this.hero.getRoomPositionX())
+			{
+			  Vec2 mousePosition = new Vec2(Mouse.getX() + 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
+			  Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+			  Vec2 force = mousePosition.sub(playerPosition);
+			  this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			}
+			else
+			{
+				Vec2 mousePosition = new Vec2(Mouse.getX() - 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
+				Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+				Vec2 force = mousePosition.sub(playerPosition);
+				this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			}
+		}
+	}
 	
 	@Override
 	public void keyReleased(int k, char c)
@@ -172,6 +195,24 @@ public class MainGameState extends BasicGameState
 		if(k == Input.KEY_RIGHT)
 		{
 			
+		}
+		
+		if(k == Input.KEY_W)
+		{
+			if(Mouse.getX() > this.hero.getRoomPositionX())
+			{
+			  Vec2 mousePosition = new Vec2(Mouse.getX() - 1000000, Mouse.getY()).mul(0.5f).mul(1/30f);
+			  Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+			  Vec2 force = mousePosition.sub(playerPosition);
+			  this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			}
+			else
+			{
+				Vec2 mousePosition = new Vec2(Mouse.getX() + 1000000, Mouse.getY()).mul(0.5f).mul(1/30f);
+				Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+				Vec2 force = mousePosition.sub(playerPosition);
+				this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			}
 		}
 	}
 	

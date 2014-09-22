@@ -56,7 +56,7 @@ public class Hero extends Entity
 	 
 	 // box2d BodyDefinitions
 	 BodyDef playerBodyDef, linkBodyDef, lastLinkBodyDef, wallBodyDef;
-	 Body playerBody, linkBody, lastLinkBody, wallBody;
+	 public Body playerBody, linkBody, lastLinkBody, wallBody;
 	 FixtureDef chainProperties, wallProperties;
 	 RevoluteJointDef joint;
 	 
@@ -165,7 +165,7 @@ public class Hero extends Entity
 		}
 		
 		
-		if(Mouse.isButtonDown(0)) 
+		if(input.isKeyDown(Input.KEY_W)) 
 		{
 			if(Mouse.getX() > this.getRoomPositionX())
 			{
