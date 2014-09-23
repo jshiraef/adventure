@@ -71,6 +71,14 @@ public abstract class Entity
 		this.y = (ry * Room.HEIGHT) + ((ty + 0.5f) * Tile.SIZE);
 	}
 	
+	public Entity(Dungeon dungeon, Room room, int tx, int ty)
+	{
+		this.dungeon = dungeon;
+		
+		this.x = (room.getRoomyX() * Room.WIDTH) + ((tx + 0.5f) * Tile.SIZE);
+		this.y = (room.getRoomyY() * Room.HEIGHT) + ((ty + 0.5f) * Tile.SIZE);
+	}
+	
 	public void update(int delta)
 	{
 		if(justHit > 0)

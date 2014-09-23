@@ -67,6 +67,9 @@ public class Hero extends Entity
 	 private float anchorY;
 	 private Vec2 anchor;
 	 private Vec2 box2dPlayerPosition, chainTrailingPosition;
+	 
+	 private ChainEnd ball;
+	 private int ballDamage;
 	
 	public Hero(Dungeon dungeon, Room room, int tx, int ty) throws SlickException
 	{
@@ -76,6 +79,8 @@ public class Hero extends Entity
 		this.acceleration = 0.06f;
 		this.deacceleration = 0.02f;
 		this.maximumVelocity = 3f;
+		
+		this.ballDamage = 2;
 		
 		this.currentHealth = this.maximumHealth = 15;
 		
@@ -153,6 +158,9 @@ public class Hero extends Entity
 	
 	public void update(Input input, int delta)
 	{						
+		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
+//		System.out.println("the last Link's position is " + lastLinkBody.getPosition().x * 30 + " , " + lastLinkBody.getPosition().y * 30);
+		
 		// binds the chain to the hero's position
 		playerBody.setTransform(box2dPlayerPosition, 0);
 		
@@ -212,6 +220,8 @@ public class Hero extends Entity
 		{
 			blinking = false;
 		}
+		
+		this.ball.update();
 	
 		this.dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).visited = true;
 		
@@ -376,7 +386,7 @@ public class Hero extends Entity
 		staticBodies.clear();
 	}
 	
-	public void setupChain()
+	public void setupChain() throws SlickException
 	{
 		// setup Player's box2d body 
 			playerBodyDef = new BodyDef();
@@ -418,6 +428,7 @@ public class Hero extends Entity
 						world.createJoint(joint);
 						prevBody = linkBody;
 						bodies.add(lastLinkBody);
+						this.ball = new ChainEnd(this.dungeon, this.getRoom(), this.getTileyX(), this.getTileyY(), this.direction, lastLinkBody, this);
 					}
 					else
 					{
@@ -469,6 +480,12 @@ public class Hero extends Entity
 			{
 				hit(e.getDamage());
 				e.maximumVelocity = .3f;
+			}
+			
+			if(this.ball.intersects(e))
+			{
+				e.hit(ballDamage);
+				break;
 			}
 		}
 	}
