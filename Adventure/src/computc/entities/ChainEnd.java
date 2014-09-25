@@ -35,8 +35,6 @@ public class ChainEnd extends Entity{
 		this.x = this.getRoom().getX() + (chain.lastLinkBody.getPosition().x * 30) + this.getHalfWidth();
 		this.y = this.getRoom().getY() + (chain.lastLinkBody.getPosition().y * 30) + this.getHalfHeight();
 		
-		System.out.println("the ball and chain's room coordinates: " + this.getRoom().getX() + " , " + this.getRoom().getY());
-		
 		if(direction == Direction.NORTH)
 		{
 			

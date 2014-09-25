@@ -61,8 +61,7 @@ public class Chain
 		this.y = (entity.getY() + entity.getHalfWidth())/30;
 		
 		setupChain(world);
-		
-		System.out.println("the chain's entity x & y is: " + this.entity.getX() + " , " + this.entity.getY());
+
 	}
 	public void render(Graphics graphics, Camera camera)
 	{
@@ -138,7 +137,6 @@ public class Chain
 						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x + i, playerBody.getPosition().y);
 						body.setTransform(fixedPosition, 0);
 						body.setType(BodyType.DYNAMIC);
-						System.out.println("this happened");
 					}
 				
 				if(body.getPosition().x < playerBody.getPosition().x - (bodies.size()))
@@ -147,7 +145,6 @@ public class Chain
 						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x - i, playerBody.getPosition().y);
 						body.setTransform(fixedPosition, 0);
 						body.setType(BodyType.DYNAMIC);
-						System.out.println("this also happened");
 					}
 				
 				if(body.getPosition().y > playerBody.getPosition().y + (bodies.size()))
@@ -156,7 +153,6 @@ public class Chain
 						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x, playerBody.getPosition().y + i);
 						body.setTransform(fixedPosition, 0);
 						body.setType(BodyType.DYNAMIC);
-						System.out.println("this also happened - 3rd time");
 					}
 				
 				if(body.getPosition().y < playerBody.getPosition().y - (bodies.size() - 1))
@@ -165,7 +161,6 @@ public class Chain
 						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x, playerBody.getPosition().y - i);
 						body.setTransform(fixedPosition, 0);
 						body.setType(BodyType.DYNAMIC);
-						System.out.println("this also happened - 4th time");
 					}
 				}
 			}

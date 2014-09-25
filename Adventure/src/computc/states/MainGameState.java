@@ -201,6 +201,8 @@ public class MainGameState extends BasicGameState
 		// swinging chain attack
 		if(k == Input.KEY_W)
 		{
+			this.hero.setChainAttack();
+			
 			if(Mouse.getX() > this.hero.getRoomPositionX())
 			{
 			  Vec2 mousePosition = new Vec2(Mouse.getX() - 1000000, Mouse.getY()).mul(0.5f).mul(1/30f);

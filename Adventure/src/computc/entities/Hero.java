@@ -38,6 +38,8 @@ import computc.worlds.Tile;
 public class Hero extends Entity
 {
 	private boolean dead = false;
+	protected boolean chainAttack;
+	protected int chainAttackCooldown;
 	
 	Image ironBall = new Image("res/ironball.png");
 	
@@ -103,10 +105,8 @@ public class Hero extends Entity
 	
 	public void update(Input input, int delta)
 	{						
-		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
-//		System.out.println("the last Link's position is " + lastLinkBody.getPosition().x * 30 + " , " + lastLinkBody.getPosition().y * 30);
-//		System.out.println("the hero's position is: " + this.x + " , " + this.y);
-//		System.out.println("mouse position is: " + Mouse.getX());
+//		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
+
 		
 		this.chain.playerBody.setTransform(box2dPlayerPosition, 0);
 		
@@ -123,7 +123,7 @@ public class Hero extends Entity
 			maximumVelocity = 3f;
 		}
 		
-
+		
 		if (blinkCooldown > 0)
 		{
 			blinkCooldown --;
@@ -133,6 +133,19 @@ public class Hero extends Entity
 		{
 			blinking = false;
 		}
+		
+		
+		if(chainAttackCooldown > 0)
+		{
+			chainAttackCooldown -= delta;
+		}
+		
+		if(chainAttackCooldown <= 0)
+		{
+			chainAttack = false;
+			chainAttackCooldown = 0;
+		}
+		
 		this.ball.update();
 	
 		this.dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).visited = true;
@@ -288,10 +301,13 @@ public class Hero extends Entity
 				e.maximumVelocity = .3f;
 			}
 			
-			if(this.ball.intersects(e))
+			if(chainAttack)
 			{
-				e.hit(ballDamage);
-				break;
+				if(this.ball.intersects(e))
+				{
+					e.hit(ballDamage);
+					break;
+				}
 			}
 		}
 	}
@@ -309,6 +325,17 @@ public class Hero extends Entity
 	public void setAlive()
 	{
 		dead = false;
+	}
+	
+	public void setChainAttack()
+	{
+		chainAttack = true;
+		chainAttackCooldown = 200;
+	}
+	
+	public boolean getChainAttack()
+	{
+		return chainAttack;
 	}
 	
 	private float speed = 0.25f;
