@@ -1,5 +1,6 @@
 package computc.entities;
 
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.Graphics;
@@ -52,6 +53,11 @@ public abstract class Entity
 	protected int currentHealth;
 	protected int maximumHealth;
 	protected int justHit = 0;
+	
+	// box2d status
+	protected World world;
+	protected boolean newRoom = true;
+	protected boolean roomTransition = true;
 	
 	public Entity(Dungeon dungeon, int rx, int ry, int tx, int ty)
 	{
@@ -208,6 +214,11 @@ public abstract class Entity
 	public Room getRoom()
 	{
 		return dungeon.getRoom(this.getRoomyX(), this.getRoomyY());
+	}
+	
+	public World getWorld()
+	{
+		return world;
 	}
 	
 	public int getHalfWidth()

@@ -7,31 +7,35 @@ import org.newdawn.slick.SlickException;
 import computc.Direction;
 import computc.worlds.Dungeon;
 import computc.worlds.Room;
+import computc.worlds.Tile;
 
 public class ChainEnd extends Entity{
 	
 	private boolean hit;
 	private boolean remove;
-	private Hero hero;
+	private Entity entity;
 	
-	private Body box2dBody;
+	
+	private Chain chain;
 	
 	Image ironBall = new Image("res/ironBall.png");
 	
-	public ChainEnd(Dungeon dungeon, Room room, int tx, int ty, Direction direction, Body box2dBody, Hero hero) throws SlickException
+	public ChainEnd(Dungeon dungeon, int tx, int ty, Direction direction, Chain chain, Entity entity) throws SlickException
 	{
-		super(dungeon, room, tx, ty);
+		super(dungeon, tx, ty);
 		
 		this.direction = direction;
 		this.dungeon = dungeon;
-		this.acceleration = 7f;
 		
 		this.image = ironBall;
-		this.hero = hero;
-		this.box2dBody = box2dBody;
+		this.entity = entity;
+		this.chain = chain;
 		
-		this.x = hero.getRoom().getX() + (box2dBody.getPosition().x * 30) + this.getHalfWidth();
-		this.y = hero.getRoom().getY() + (box2dBody.getPosition().y * 30) + this.getHalfHeight();
+		
+		this.x = this.getRoom().getX() + (chain.lastLinkBody.getPosition().x * 30) + this.getHalfWidth();
+		this.y = this.getRoom().getY() + (chain.lastLinkBody.getPosition().y * 30) + this.getHalfHeight();
+		
+		System.out.println("the ball and chain's room coordinates: " + this.getRoom().getX() + " , " + this.getRoom().getY());
 		
 		if(direction == Direction.NORTH)
 		{
@@ -50,11 +54,20 @@ public class ChainEnd extends Entity{
 			
 		}
 		
-		
 	}
 	
 		public void update()
 		{
+			if(this.entity.newRoom)
+			{
+				this.x = this.entity.x;
+				this.y = this.entity.y;
+			}
+			
+			
+			this.x = this.getRoom().getX() + (chain.lastLinkBody.getPosition().x * 30) + this.getHalfWidth();
+			this.y = this.getRoom().getY() + (chain.lastLinkBody.getPosition().y * 30) + this.getHalfHeight();
+
 		
 			checkTileMapCollision();
 			setPosition(xtemp, ytemp);
@@ -67,9 +80,6 @@ public class ChainEnd extends Entity{
 //			{
 //				setHit();
 //			}
-			
-			this.x = hero.getRoom().getX() + (box2dBody.getPosition().x * 30) + this.getHalfWidth();
-			this.y = hero.getRoom().getY() + (box2dBody.getPosition().y * 30) + this.getHalfHeight();
 			
 			if(hit)
 			{

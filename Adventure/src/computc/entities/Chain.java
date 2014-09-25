@@ -13,7 +13,12 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.lwjgl.input.Mouse;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
 
+import computc.Camera;
 import computc.worlds.Room;
 
 public class Chain 
@@ -22,71 +27,115 @@ public class Chain
 	protected float y;
 	
 	private int meterToPixel;
+	private int roomLoadingCooldown;
 	
-	 public  Set<Body> bodies = new HashSet<Body>();
-	 public  Set<Body> staticBodies = new HashSet<Body>();
+	public  Set<Body> bodies = new HashSet<Body>();
+	public  Set<Body> staticBodies = new HashSet<Body>();
 	 
-	 private World world;
-	 
-	 // box2d BodyDefinitions
-	 BodyDef playerBodyDef, linkBodyDef, lastLinkBodyDef, wallBodyDef;
-	 Body playerBody, linkBody, lastLinkBody, wallBody;
-	 FixtureDef chainProperties, wallProperties;
-	 RevoluteJointDef joint;
+	// box2d BodyDefinitions
+	BodyDef playerBodyDef, linkBodyDef, lastLinkBodyDef, wallBodyDef;
+	public Body playerBody, linkBody, lastLinkBody, wallBody;
+	FixtureDef chainProperties, wallProperties;
+	RevoluteJointDef joint;
 	 
 	 // box2d shapes
-	 PolygonShape playerBoxShape, chainLinkShape;
-	 CircleShape wallCollisionShape;
+	PolygonShape playerBoxShape, chainLinkShape;
+	CircleShape wallCollisionShape;
 	 
-	 private float anchorY;
-	 private Vec2 anchor;
-	 
-	 private Entity entity;
+	private float anchorY;
+	private Vec2 anchor;
 	
-	public Chain(World world, Entity entity)
+	private Vec2 box2dPlayerPosition;
+	 
+	private Entity entity;
+	
+	Image chainLink = new Image("res/links2.png");
+	
+	public Chain(World world, Entity entity) throws SlickException
 	{
-		this.world = world;
 		this.entity = entity;
 		
 		this.meterToPixel = 30;
 		
-		
-		
 		this.x = (entity.getX() + entity.getHalfWidth())/30;
 		this.y = (entity.getY() + entity.getHalfWidth())/30;
 		
+		setupChain(world);
+		
 		System.out.println("the chain's entity x & y is: " + this.entity.getX() + " , " + this.entity.getY());
 	}
-	
-	public void update(int delta)
+	public void render(Graphics graphics, Camera camera)
 	{
-	// converts box2d position to hero's position on screen
-		Vec2 box2DplayerPosition = new Vec2(entity.getX()/entity.getRoomyX() - Room.WIDTH, entity.getRoomPositionY()/30);
-						
+		if(!this.entity.dungeon.getDebugDraw())
+		{
+			// draw chain - chain link rotation needs work
+			for(Body body: bodies)
+			{
+				if(body.getType() == BodyType.DYNAMIC || body.getType() == BodyType.STATIC) 
+				{
+					Vec2 bodyPosition = body.getPosition().mul(30);
+					if(!entity.roomTransition)
+					{
+					chainLink.draw(bodyPosition.x, bodyPosition.y);
+					}
+					chainLink.setRotation((float) Math.toDegrees(body.getAngle()));
+				}
+			}
+		}
+		
+		// draw debug mode
+		else this.entity.dungeon.rigidBodyDebugDraw(bodies, staticBodies);
+		
+		if(camera.getX() != this.entity.getRoom().getX() || camera.getY() != this.entity.getRoom().getY())
+		{
+			if(roomLoadingCooldown <= 0)
+			{
+				entity.newRoom = true;
+				roomLoadingCooldown = 200;
+				
+			}
+			roomLoadingCooldown--;
+			
+			entity.roomTransition = true;
+			lastLinkBody.setType(BodyType.STATIC);
+		}
+		else 
+		{
+			roomLoadingCooldown = 0;	
+			entity.roomTransition = false;
+			lastLinkBody.setType(BodyType.DYNAMIC);
+			
+		}
+		// converts box2d position to hero's position on screen
+		box2dPlayerPosition = new Vec2(this.entity.getLocalX(camera)/30, this.entity.getLocalY(camera)/30);	
+	}
+	
+	public void update(Input input, int delta)
+	{						
 	// binds the chain to the hero's position
-//		playerBody.setTransform(new Vec2(this.x, this.y), 0);
+//		playerBody.setTransform(box2dPlayerPosition, 0);
 		
 //		System.out.println("the chain's playerbody is: " + playerBody.getPosition().x + " , " + playerBody.getPosition().y);
 //		System.out.println("the chain's x is: " + this.x + " , " + this.y);
-				
-				
-		if(Mouse.isButtonDown(0)) 
+		
+		if(entity.roomTransition)
 		{
-			if(Mouse.getX() > entity.getRoomPositionX())
+			for(Body body: bodies)
 			{
-				Vec2 mousePosition = new Vec2(Mouse.getX() + 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
-				Vec2 playerPosition = new Vec2(playerBody.getPosition());
-				Vec2 force = mousePosition.sub(playerPosition);
-				lastLinkBody.applyForce(force,  lastLinkBody.getPosition());
+				body.setTransform(box2dPlayerPosition, 0);
 			}
-			else
+		}
+		
+		if(entity.dx > 0 || entity.dx < 0 || entity.dy > 0 || entity.dy < 0)
+		{
+			
+			if(entity.newRoom)
 			{
-				Vec2 mousePosition = new Vec2(Mouse.getX() - 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
-				Vec2 playerPosition = new Vec2(playerBody.getPosition());
-				Vec2 force = mousePosition.sub(playerPosition);
-				lastLinkBody.applyForce(force,  lastLinkBody.getPosition());
+			loadRoomRigidBodies(entity.getWorld());
+			entity.newRoom = false;
 			}
-		}	
+			
+		}
 	}
 	
 	public void setupChain(World world)
@@ -94,14 +143,13 @@ public class Chain
 		// setup Player's box2d body 
 			playerBodyDef = new BodyDef();
 			playerBodyDef.type = BodyType.STATIC;
-			playerBodyDef.position.set(this.x, this.y);
 			playerBody = world.createBody(playerBodyDef);
 			playerBoxShape = new PolygonShape();
 			playerBoxShape.setAsBox(0.8f, 0.8f);
 			playerBody.createFixture(playerBoxShape, 0.0f);
 			
 			chainLinkShape = new PolygonShape();
-			chainLinkShape.setAsBox(0.3f, 0.060f);
+			chainLinkShape.setAsBox(0.5f, 0.060f);
 				
 		// setup chain Properties (FixtureDef)
 			chainProperties = new FixtureDef();
@@ -112,14 +160,48 @@ public class Chain
 		// joint setup
 			joint = new RevoluteJointDef();
 			joint.collideConnected = false;
-			anchorY = entity.getY()/30 - 3f;
+			anchorY = entity.getRoomPositionY()/30 - 3f;
 			Body prevBody = playerBody;
 			bodies.add(playerBody);
 				
 		// make chain links
-			for (float i = entity.getX()/30 - 12; i < entity.getY()/30; i++)
+//			for (float i = entity.getX()/30 - 12; i < entity.getY()/30; i++)
+//				{
+//					if(i >= entity.getRoomPositionY()/30 - 1)
+//					{
+//						lastLinkBodyDef = new BodyDef();
+//						lastLinkBodyDef.type = BodyType.DYNAMIC;
+//						lastLinkBodyDef.position.set(0.2f + i, anchorY);
+//						lastLinkBody = world.createBody(lastLinkBodyDef);
+//						lastLinkBody.createFixture(chainProperties);
+//						anchor = new Vec2(i, anchorY);
+//						
+//						joint.initialize(prevBody, lastLinkBody, anchor);
+//						world.createJoint(joint);
+//						prevBody = linkBody;
+//						bodies.add(lastLinkBody);
+//						System.out.println("This did happen!");
+//					}
+//					else
+//					{
+//					linkBodyDef = new BodyDef();
+//					linkBodyDef.type = BodyType.DYNAMIC;
+//					linkBodyDef.position.set(0.2f + i, anchorY);
+//					linkBody = world.createBody(linkBodyDef);	
+//					linkBody.createFixture(chainProperties);
+//					anchor = new Vec2(i, anchorY);
+//					
+//					// initialize joint
+//					joint.initialize(prevBody, linkBody, anchor);
+//					world.createJoint(joint);
+//					prevBody = linkBody;
+//					bodies.add(linkBody);
+//					}
+//				}
+			// make chain links
+			for (float i = this.entity.getRoomPositionX()/30 - 12; i < this.entity.getRoomPositionY()/30; i++)
 				{
-					if(i >= entity.getRoomPositionY()/30 - 1)
+					if(i >= this.entity.getRoomPositionY()/30 - 2)
 					{
 						lastLinkBodyDef = new BodyDef();
 						lastLinkBodyDef.type = BodyType.DYNAMIC;
@@ -127,12 +209,11 @@ public class Chain
 						lastLinkBody = world.createBody(lastLinkBodyDef);
 						lastLinkBody.createFixture(chainProperties);
 						anchor = new Vec2(i, anchorY);
-						
+									
 						joint.initialize(prevBody, lastLinkBody, anchor);
 						world.createJoint(joint);
 						prevBody = linkBody;
 						bodies.add(lastLinkBody);
-						System.out.println("This did happen!");
 					}
 					else
 					{
@@ -142,7 +223,7 @@ public class Chain
 					linkBody = world.createBody(linkBodyDef);	
 					linkBody.createFixture(chainProperties);
 					anchor = new Vec2(i, anchorY);
-					
+								
 					// initialize joint
 					joint.initialize(prevBody, linkBody, anchor);
 					world.createJoint(joint);
@@ -150,8 +231,11 @@ public class Chain
 					bodies.add(linkBody);
 					}
 				}
+			System.out.println("the chain size is: " + bodies.size());
 	}
 	
+	
+	// give walls rigidbodies for the chain to collide with
 	public void loadRoomRigidBodies(World world)
 	{
 		destroyRoomRigidBodies(world);
@@ -180,6 +264,7 @@ public class Chain
 		}
 	}
 	
+	// destroy all static rigidBodies
 	public void destroyRoomRigidBodies(World world)
 	{	
 		for(Body body: staticBodies)

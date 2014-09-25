@@ -109,7 +109,7 @@ public class MainGameState extends BasicGameState
 				this.hero.getWorld().setGravity(new Vec2(-1f, 0));
 			}
 			
-			else for(Body body: hero.bodies)
+			else for(Body body: hero.chain.bodies)
 			{
 				body.setLinearDamping(10);
 			}
@@ -155,21 +155,22 @@ public class MainGameState extends BasicGameState
 	
 	public void keyPressed(int k, char c)
 	{
+		// prepare swinging chain attack
 		if(k == Input.KEY_W)
 		{
 			if(Mouse.getX() > this.hero.getRoomPositionX())
 			{
 			  Vec2 mousePosition = new Vec2(Mouse.getX() + 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
-			  Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+			  Vec2 playerPosition = new Vec2(this.hero.chain.playerBody.getPosition());
 			  Vec2 force = mousePosition.sub(playerPosition);
-			  this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			  this.hero.chain.lastLinkBody.applyForce(force,  this.hero.chain.lastLinkBody.getPosition());
 			}
 			else
 			{
 				Vec2 mousePosition = new Vec2(Mouse.getX() - 10000, Mouse.getY()).mul(0.5f).mul(1/30f);
-				Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+				Vec2 playerPosition = new Vec2(this.hero.chain.playerBody.getPosition());
 				Vec2 force = mousePosition.sub(playerPosition);
-				this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+				this.hero.chain.lastLinkBody.applyForce(force,  this.hero.chain.lastLinkBody.getPosition());
 			}
 		}
 	}
@@ -197,21 +198,22 @@ public class MainGameState extends BasicGameState
 			
 		}
 		
+		// swinging chain attack
 		if(k == Input.KEY_W)
 		{
 			if(Mouse.getX() > this.hero.getRoomPositionX())
 			{
 			  Vec2 mousePosition = new Vec2(Mouse.getX() - 1000000, Mouse.getY()).mul(0.5f).mul(1/30f);
-			  Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+			  Vec2 playerPosition = new Vec2(this.hero.chain.playerBody.getPosition());
 			  Vec2 force = mousePosition.sub(playerPosition);
-			  this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+			  this.hero.chain.lastLinkBody.applyForce(force,  this.hero.chain.lastLinkBody.getPosition());
 			}
 			else
 			{
 				Vec2 mousePosition = new Vec2(Mouse.getX() + 1000000, Mouse.getY()).mul(0.5f).mul(1/30f);
-				Vec2 playerPosition = new Vec2(this.hero.playerBody.getPosition());
+				Vec2 playerPosition = new Vec2(this.hero.chain.playerBody.getPosition());
 				Vec2 force = mousePosition.sub(playerPosition);
-				this.hero.lastLinkBody.applyForce(force,  this.hero.lastLinkBody.getPosition());
+				this.hero.chain.lastLinkBody.applyForce(force,  this.hero.chain.lastLinkBody.getPosition());
 			}
 		}
 	}
