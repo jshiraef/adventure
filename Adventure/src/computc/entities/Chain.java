@@ -110,13 +110,7 @@ public class Chain
 	}
 	
 	public void update(Input input, int delta)
-	{						
-	// binds the chain to the hero's position
-//		playerBody.setTransform(box2dPlayerPosition, 0);
-		
-//		System.out.println("the chain's playerbody is: " + playerBody.getPosition().x + " , " + playerBody.getPosition().y);
-//		System.out.println("the chain's x is: " + this.x + " , " + this.y);
-		
+	{							
 		if(entity.roomTransition)
 		{
 			for(Body body: bodies)

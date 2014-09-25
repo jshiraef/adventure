@@ -66,7 +66,7 @@ public class Hero extends Entity
 		
 		this.ballDamage = 2;
 		
-		this.currentHealth = this.maximumHealth = 15;
+		this.currentHealth = this.maximumHealth = 3;
 		
 		this.image = new Image("res/hero.png");
 		
@@ -77,16 +77,21 @@ public class Hero extends Entity
 		// converts box2d position to hero's position on screen
 		box2dPlayerPosition = new Vec2(this.getRoomPositionX()/30, this.getRoomPositionY()/30);
 		
-		
+		if(this.dungeon.chainEnabled)
+		{
 		this.chain = new Chain(this.world, this);
 		this.chain.playerBody.setTransform(box2dPlayerPosition, 0);
 		this.ball = new ChainEnd(this.dungeon, this.getTileyX(), this.getTileyY(), this.direction, this.chain, this);
+		}
 	}
 	
 	public void render(Graphics graphics, Camera camera)
 	{
-		super.render(graphics, camera);
+		if(this.dungeon.chainEnabled)
+		{
 		this.chain.render(graphics, camera);
+		ironBall.draw(this.chain.lastLinkBody.getPosition().x * 30, (this.chain.lastLinkBody.getPosition().y * 30));
+		}
 		
 		if(blinking) 
 		{
@@ -95,7 +100,8 @@ public class Hero extends Entity
 				return;
 			}
 		}	
-		ironBall.draw(this.chain.lastLinkBody.getPosition().x * 30, (this.chain.lastLinkBody.getPosition().y * 30) + 5);
+		
+		super.render(graphics, camera);
 		
 		// converts box2d position to hero's position on screen
 		box2dPlayerPosition = new Vec2(this.getLocalX(camera)/30, this.getLocalY(camera)/30);
@@ -104,9 +110,6 @@ public class Hero extends Entity
 	public void update(Input input, int delta)
 	{						
 //		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
-
-		
-		this.chain.playerBody.setTransform(box2dPlayerPosition, 0);
 		
 		getNextPosition(input, delta);
 		checkTileMapCollision();
@@ -133,24 +136,32 @@ public class Hero extends Entity
 		}
 		
 		
-		if(chainAttackCooldown > 0)
+		// chain stuff
+		if(this.dungeon.chainEnabled)
 		{
-			chainAttackCooldown -= delta;
-		}
 		
-		if(chainAttackCooldown <= 0)
-		{
-			chainAttack = false;
-			chainAttackCooldown = 0;
-		}
+			this.chain.playerBody.setTransform(box2dPlayerPosition, 0);
 		
-		this.ball.update();
+			if(chainAttackCooldown > 0)
+			{
+				chainAttackCooldown -= delta;
+			}
+		
+			if(chainAttackCooldown <= 0)
+			{
+				chainAttack = false;
+				chainAttackCooldown = 0;
+			}
+		
+			this.ball.update();
+		
+			this.chain.update(input, delta);
+		
+		}
 	
 		this.dungeon.getRoom(this.getRoomyX(), this.getRoomyY()).visited = true;
 		
 		super.update(delta);
-		
-		this.chain.update(input, delta);
 		
 		// the update method for the box2d world
 		world.step(1/60f, 8, 3);

@@ -44,6 +44,9 @@ public class Dungeon
 	public Vec2 gravity = new Vec2(0, .5f);
 	
 	public boolean debug = false;
+	
+	
+	public boolean chainEnabled = true;
 
 	private Image explosion;
 	private float explodeX;
@@ -183,12 +186,6 @@ public class Dungeon
 		for(Enemy thug : this.thugs)
 		{
 			thug.render(graphics, camera);
-			
-//			if(thug.justDied)
-//			{
-//				explode.draw(thug.getX() - thug.getHalfWidth() - camera.getX(), thug.getY() - thug.getHalfHeight() - camera.getY());
-//				System.out.println("the thug's drawing x & y should be: " + (thug.getX() - thug.getHalfWidth() - camera.getX()) + " , " + (thug.getY() - thug.getHalfHeight() - camera.getY()));
-//			}
 		}
 		
 		for(int i = 0; i < explosions.size(); i++)
@@ -281,5 +278,16 @@ public class Dungeon
 	public boolean getDebugDraw()
 	{
 		return debug;
+	}
+	
+	// if you want turn chain off
+	public void disableChain()
+	{
+		chainEnabled = false;
+	}
+	
+	public void enableChain()
+	{
+		chainEnabled = true;
 	}
 }
