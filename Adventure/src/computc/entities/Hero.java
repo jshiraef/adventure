@@ -94,10 +94,8 @@ public class Hero extends Entity
 			{
 				return;
 			}
-		}
-		
-		
-		ironBall.draw(this.chain.lastLinkBody.getPosition().x * 30, this.chain.lastLinkBody.getPosition().y * 30);
+		}	
+		ironBall.draw(this.chain.lastLinkBody.getPosition().x * 30, (this.chain.lastLinkBody.getPosition().y * 30) + 5);
 		
 		// converts box2d position to hero's position on screen
 		box2dPlayerPosition = new Vec2(this.getLocalX(camera)/30, this.getLocalY(camera)/30);

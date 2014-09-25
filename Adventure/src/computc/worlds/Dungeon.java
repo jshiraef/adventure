@@ -20,9 +20,12 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.tiled.TiledMap;
 
 import computc.Camera;
@@ -35,11 +38,17 @@ public class Dungeon
 {
 	private HashMap<String, Room> rooms = new HashMap<String, Room>();
 	public LinkedList<Enemy> thugs; 
+	public LinkedList<Animation> explosions;
 	public Point[] thug_positions_in_tiley_coordinates;
 	
 	public Vec2 gravity = new Vec2(0, .5f);
 	
 	public boolean debug = false;
+
+	private Image explosion;
+	private float explodeX;
+	private float explodeY;
+	private float enemyHalfWidth;
 	
 	public Dungeon() throws SlickException
 	{
@@ -128,6 +137,12 @@ public class Dungeon
 		
 		thugs.add(new BigThug(this, 36, 23));
 		
+		this.explosion = new Image("res/explosion.png");
+		
+		this.explosions = new LinkedList<Animation>();
+		
+		this.enemyHalfWidth = 24;
+		
 	}
 	
 	public void update(int delta) throws SlickException
@@ -139,6 +154,9 @@ public class Dungeon
 				if(e.isDead())
 				{
 					thugs.remove(i);
+					this.explodeX = e.getX();
+					this.explodeY = e.getY();
+					explosions.add(new Animation(new SpriteSheet(explosion, 30, 30), 200));
 					i--;
 				}
 		}
@@ -165,6 +183,26 @@ public class Dungeon
 		for(Enemy thug : this.thugs)
 		{
 			thug.render(graphics, camera);
+			
+//			if(thug.justDied)
+//			{
+//				explode.draw(thug.getX() - thug.getHalfWidth() - camera.getX(), thug.getY() - thug.getHalfHeight() - camera.getY());
+//				System.out.println("the thug's drawing x & y should be: " + (thug.getX() - thug.getHalfWidth() - camera.getX()) + " , " + (thug.getY() - thug.getHalfHeight() - camera.getY()));
+//			}
+		}
+		
+		for(int i = 0; i < explosions.size(); i++)
+		{
+			Animation explode = explosions.get(i);
+			
+			explode.draw(explodeX - enemyHalfWidth - camera.getX(), explodeY - enemyHalfWidth - camera.getY());
+			
+			explode.setLooping(false);
+			
+			if(explode.isStopped())
+			{
+				explosions.remove(i);
+			}
 		}
 	}
 	

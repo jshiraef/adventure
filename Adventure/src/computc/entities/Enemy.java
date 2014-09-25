@@ -23,17 +23,11 @@ public abstract class Enemy extends Entity
     protected boolean down;
  
     protected boolean attacking;
-    
-    private Animation explode;
-	private Image explosion;
+    public boolean justDied;
 	
 	public Enemy(Dungeon dungeon, int rx, int ry, int tx, int ty) throws SlickException 
 	{
 		super(dungeon, rx, ry, tx, ty);
-		
-		this.explosion = new Image("res/explosion.png");
-		
-		this.explode = new Animation(new SpriteSheet(explosion, 30, 30), 200);
 	}
 	
 	public boolean isDead()
@@ -56,7 +50,7 @@ public abstract class Enemy extends Entity
 		health -= damage;
 		if(health <= 0)
 		{
-			explode.draw(this.getX(), this.getY());
+			justDied = true;
 			dead = true;
 		}
 		

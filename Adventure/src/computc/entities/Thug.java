@@ -67,7 +67,7 @@ public class Thug extends Enemy
 		{
 				blinking = false;
 		}
-	}
+		}
 	}
 	
 	private void getNextPosition(int delta) 
