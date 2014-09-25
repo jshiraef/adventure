@@ -84,6 +84,7 @@ public class Hero extends Entity
 	public void render(Graphics graphics, Camera camera)
 	{
 		super.render(graphics, camera);
+		this.chain.render(graphics, camera);
 		
 		if(blinking) 
 		{
@@ -93,7 +94,7 @@ public class Hero extends Entity
 			}
 		}
 		
-		this.chain.render(graphics, camera);
+		
 		ironBall.draw(this.chain.lastLinkBody.getPosition().x * 30, this.chain.lastLinkBody.getPosition().y * 30);
 		
 		// converts box2d position to hero's position on screen
@@ -102,9 +103,9 @@ public class Hero extends Entity
 	
 	public void update(Input input, int delta)
 	{						
-//		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
+		System.out.println("the ball at the end of the chain's x & y are: " + this.ball.x + " , " + this.ball.y);
 //		System.out.println("the last Link's position is " + lastLinkBody.getPosition().x * 30 + " , " + lastLinkBody.getPosition().y * 30);
-		
+//		System.out.println("the hero's position is: " + this.x + " , " + this.y);
 //		System.out.println("mouse position is: " + Mouse.getX());
 		
 		this.chain.playerBody.setTransform(box2dPlayerPosition, 0);

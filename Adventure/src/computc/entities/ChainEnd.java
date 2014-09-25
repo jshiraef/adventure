@@ -58,17 +58,18 @@ public class ChainEnd extends Entity{
 	
 		public void update()
 		{
-			if(this.entity.newRoom)
+			if(this.entity.roomTransition)
 			{
 				this.x = this.entity.x;
 				this.y = this.entity.y;
 			}
+			else
+			{
+				this.x = this.getRoom().getX() + (chain.lastLinkBody.getPosition().x * 30) + this.getHalfWidth();
+				this.y = this.getRoom().getY() + (chain.lastLinkBody.getPosition().y * 30) + this.getHalfHeight();
+			}
 			
-			
-			this.x = this.getRoom().getX() + (chain.lastLinkBody.getPosition().x * 30) + this.getHalfWidth();
-			this.y = this.getRoom().getY() + (chain.lastLinkBody.getPosition().y * 30) + this.getHalfHeight();
 
-		
 			checkTileMapCollision();
 			setPosition(xtemp, ytemp);
 		
@@ -85,6 +86,8 @@ public class ChainEnd extends Entity{
 			{
 				remove = true;
 			}
+			
+			
 		}
 	
 		public void setHit()

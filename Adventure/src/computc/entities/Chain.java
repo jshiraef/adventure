@@ -47,7 +47,7 @@ public class Chain
 	
 	private Vec2 box2dPlayerPosition;
 	 
-	private Entity entity;
+	public Entity entity;
 	
 	Image chainLink = new Image("res/links2.png");
 	
@@ -126,6 +126,50 @@ public class Chain
 			}
 		}
 		
+		// making sure the chain behaves properly
+		for(Body body: bodies)
+			{
+			for(int i = 0; i < bodies.size(); i++)
+				{
+				
+				if(body.getPosition().x > playerBody.getPosition().x + (bodies.size()))
+					{
+						body.setType(BodyType.KINEMATIC);
+						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x + i, playerBody.getPosition().y);
+						body.setTransform(fixedPosition, 0);
+						body.setType(BodyType.DYNAMIC);
+						System.out.println("this happened");
+					}
+				
+				if(body.getPosition().x < playerBody.getPosition().x - (bodies.size()))
+					{
+						body.setType(BodyType.KINEMATIC);
+						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x - i, playerBody.getPosition().y);
+						body.setTransform(fixedPosition, 0);
+						body.setType(BodyType.DYNAMIC);
+						System.out.println("this also happened");
+					}
+				
+				if(body.getPosition().y > playerBody.getPosition().y + (bodies.size()))
+					{
+						body.setType(BodyType.KINEMATIC);
+						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x, playerBody.getPosition().y + i);
+						body.setTransform(fixedPosition, 0);
+						body.setType(BodyType.DYNAMIC);
+						System.out.println("this also happened - 3rd time");
+					}
+				
+				if(body.getPosition().y < playerBody.getPosition().y - (bodies.size() - 1))
+					{
+						body.setType(BodyType.KINEMATIC);
+						Vec2 fixedPosition = new Vec2(playerBody.getPosition().x, playerBody.getPosition().y - i);
+						body.setTransform(fixedPosition, 0);
+						body.setType(BodyType.DYNAMIC);
+						System.out.println("this also happened - 4th time");
+					}
+				}
+			}
+		
 		if(entity.dx > 0 || entity.dx < 0 || entity.dy > 0 || entity.dy < 0)
 		{
 			
@@ -163,41 +207,7 @@ public class Chain
 			anchorY = entity.getRoomPositionY()/30 - 3f;
 			Body prevBody = playerBody;
 			bodies.add(playerBody);
-				
-		// make chain links
-//			for (float i = entity.getX()/30 - 12; i < entity.getY()/30; i++)
-//				{
-//					if(i >= entity.getRoomPositionY()/30 - 1)
-//					{
-//						lastLinkBodyDef = new BodyDef();
-//						lastLinkBodyDef.type = BodyType.DYNAMIC;
-//						lastLinkBodyDef.position.set(0.2f + i, anchorY);
-//						lastLinkBody = world.createBody(lastLinkBodyDef);
-//						lastLinkBody.createFixture(chainProperties);
-//						anchor = new Vec2(i, anchorY);
-//						
-//						joint.initialize(prevBody, lastLinkBody, anchor);
-//						world.createJoint(joint);
-//						prevBody = linkBody;
-//						bodies.add(lastLinkBody);
-//						System.out.println("This did happen!");
-//					}
-//					else
-//					{
-//					linkBodyDef = new BodyDef();
-//					linkBodyDef.type = BodyType.DYNAMIC;
-//					linkBodyDef.position.set(0.2f + i, anchorY);
-//					linkBody = world.createBody(linkBodyDef);	
-//					linkBody.createFixture(chainProperties);
-//					anchor = new Vec2(i, anchorY);
-//					
-//					// initialize joint
-//					joint.initialize(prevBody, linkBody, anchor);
-//					world.createJoint(joint);
-//					prevBody = linkBody;
-//					bodies.add(linkBody);
-//					}
-//				}
+			
 			// make chain links
 			for (float i = this.entity.getRoomPositionX()/30 - 12; i < this.entity.getRoomPositionY()/30; i++)
 				{
@@ -219,7 +229,7 @@ public class Chain
 					{
 					linkBodyDef = new BodyDef();
 					linkBodyDef.type = BodyType.DYNAMIC;
-					linkBodyDef.position.set(0.2f + i, anchorY);
+					linkBodyDef.position.set(1f + i, anchorY);
 					linkBody = world.createBody(linkBodyDef);	
 					linkBody.createFixture(chainProperties);
 					anchor = new Vec2(i, anchorY);
@@ -254,6 +264,7 @@ public class Chain
 				wallProperties = new FixtureDef();
 				wallProperties.density = 1;
 				wallProperties.restitution = .3f;
+				wallProperties.friction = 0f;
 				wallProperties.shape = wallCollisionShape;
 				wallBody.createFixture(wallProperties);
 				Vec2 roomPosition = new Vec2((2.15f * i) + 1,(2.15f * j) + 1);
