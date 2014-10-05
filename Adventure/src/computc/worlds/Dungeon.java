@@ -7,6 +7,8 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRectd;
 import static org.lwjgl.opengl.GL11.glRotated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.Point;
 import java.util.HashMap;
@@ -247,8 +249,9 @@ public class Dungeon
 	// debug mode for viewing box2d physics
 	public void rigidBodyDebugDraw(Set<Body> bodies, Set<Body> staticBodies) 
 	{
+		glColor3f(0, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
+
 		for(Body body: bodies)
 		{
 				glPushMatrix();

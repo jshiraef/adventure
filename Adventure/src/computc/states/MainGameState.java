@@ -123,9 +123,9 @@ public class MainGameState extends BasicGameState
 	public void render(GameContainer container, StateBasedGame game, Graphics graphics) throws SlickException
 	{
 		this.dungeon.render(graphics, camera);
-		this.hero.render(graphics, camera);
 		this.oldman.render(graphics, camera);
 		this.menu.render(graphics, camera);
+		this.hero.render(graphics, camera);
 		
 		/*if(hero.isDead() == true)
 		{
